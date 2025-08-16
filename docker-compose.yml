@@ -1,0 +1,21 @@
+services:
+  suprema:
+    build: .
+    container_name: suprema_allinone
+    env_file: .env
+    ports:
+      - "8508:8508"
+      - "8510:8510"
+    # - "6379:6379"   # exponha só se precisar acessar Redis de fora
+    volumes:
+      # - redisdata:/var/lib/redis   # se quiser persistir Redis
+      # - ./logs:/var/log            # se quiser coletar logs
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8508/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+#volumes:
+#  redisdata:
