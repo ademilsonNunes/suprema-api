@@ -47,7 +47,7 @@ def login_form():
             st.session_state.auth = True
             st.session_state.user = u
             st.success("Login efetuado.")
-            st.experimental_rerun()
+            st.rerun()  # Corrigido: removido experimental_
         else:
             st.error("Credenciais inválidas.")
 
@@ -57,7 +57,7 @@ def top_nav():
     page = st.sidebar.radio("Menu", ["Políticas", "Bloqueios", "Relatórios", "Utilitários"])
     if st.sidebar.button("Sair"):
         st.session_state.clear()
-        st.experimental_rerun()
+        st.rerun()  # Corrigido: removido experimental_
     return page
 
 def page_policies():
@@ -92,7 +92,7 @@ def page_policies():
                            window_sec=int(window_sec), max_calls=int(max_calls), block_sec=int(block_sec),
                            enabled=1 if enabled else 0, priority=int(priority), notes=notes or None, by=st.session_state.user))
             st.success("Política criada.")
-            st.experimental_rerun()
+            st.rerun()  # Corrigido
 
     with st.expander("✏️ Editar/Desativar política"):
         pid = st.number_input("ID da política", min_value=1)
@@ -115,7 +115,7 @@ def page_policies():
                            ws=int(new_window), mc=int(new_max), bs=int(new_block),
                            nt=notes or None, id=int(pid)))
             st.success("Atualizado.")
-            st.experimental_rerun()
+            st.rerun()  # Corrigido
 
 def page_blocks():
     st.header("⛔ Bloqueios manuais")
@@ -140,7 +140,7 @@ def page_blocks():
                     VALUES (:u, :e, :until, :r, :by, SYSUTCDATETIME())
                 """), dict(u=username, e=endpoint, until=until, r=reason, by=st.session_state.user))
             st.success("Bloqueio registrado.")
-            st.experimental_rerun()
+            st.rerun()  # Corrigido
 
     with st.expander("🔓 Desbloquear"):
         bid = st.number_input("ID do bloqueio", min_value=1)
