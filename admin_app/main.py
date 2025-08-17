@@ -8,6 +8,19 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timedelta
 
+import sys
+from pathlib import Path
+ROOT = Path(__file__).resolve().parents[1]  # sobe de admin_app/ ou api/ até a RAIZ
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from core.env import load_project_env
+_loaded_env = load_project_env()
+
+import os
+if not os.getenv("POLICY_DATABASE_URL"):
+    raise RuntimeError("POLICY_DATABASE_URL não definido. Verifique o .env na raiz.")
+
 # ENV
 POLICY_DATABASE_URL = os.getenv("POLICY_DATABASE_URL")
 ADMIN_APP_SECRET = os.getenv("ADMIN_APP_SECRET", "change_me_for_streamlit_csrf")

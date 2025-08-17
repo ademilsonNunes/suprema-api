@@ -21,6 +21,11 @@ from .rate_limiter import check_rate_limit
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+from core.env import load_project_env
+_loaded = load_project_env()
+logger.info(f".env carregado: {_loaded or 'NÃO ENCONTRADO'}")
+
+
 # Timeouts
 DB_CONNECTION_TIMEOUT = int(os.getenv("DB_CONNECTION_TIMEOUT", "300"))
 DB_COMMAND_TIMEOUT    = int(os.getenv("DB_COMMAND_TIMEOUT", "600"))
@@ -102,9 +107,18 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Security(security))
 
 @app.on_event("startup")
 def on_startup():
-    # Cria tabelas no BISOBEL se não existirem
-    init_policy_schema()
-    logger.info("Schema de políticas inicializado (BISOBEL).")
+    # Evita travar a API se o BISOBEL estiver indisponível
+    init_on_start = os.getenv("INIT_POLICY_ON_STARTUP", "true").lower() == "true"
+    if not init_on_start:
+        logger.warning("INIT_POLICY_ON_STARTUP=false -> pulando init_policy_schema() no startup.")
+        return
+
+    # Execução protegida: não deixar derrubar/pendurar a API
+    try:
+        init_policy_schema()
+        logger.info("Schema de políticas inicializado (BISOBEL).")
+    except Exception as e:
+        logger.error(f"Falha ao inicializar schema de políticas: {e}")
 
 def get_current_user(request: Request, token_data: dict = Depends(verify_token)) -> dict:
     """Obtém usuário atual e aplica rate limit Redis + políticas do BISOBEL"""
