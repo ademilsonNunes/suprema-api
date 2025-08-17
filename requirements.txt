@@ -9,3 +9,4 @@ python-dotenv==1.0.1
 bcrypt==4.2.0
 streamlit==1.37.1
 plotly==5.23.0
+python-multipart>=0.0.7
